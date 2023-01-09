@@ -13,3 +13,7 @@ Suhaib added Login Screen instead of select view.
 Abdullah modified the design and the login system to meet the User story needs. 
 Odai Added functionality to the add and remove buttons as well as the Update button, added functionality to generate invoice including generating a txt file with invoice, Added notify customer feature to send emails to customers who wish to be notified about the current state of their ordered item (Through email). 
 Suhaib made some design changes that shall appear in the next Commit. 
+
+-----------8th Commit 9/January/2023 -----------
+Odai Modified the email send functionality and Added a Logo for the App.  
+Suhaib made some changes to the application's Design. 
