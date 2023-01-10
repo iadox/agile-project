@@ -420,7 +420,7 @@ def send_func(lis,n,em):
     body3 = f'''Subject: Status Update for your Item\n \n\nDear {name},\n\nThe items you ordered ({item_name}: Quantity:{quantity}, Total price: {quantity*price}$) is currently {item_status}, Thank you for your patience, we will email you as soon as it is out for delivery.
     \nKind regards, \nThe warehouse'''
     
-    if item_status == "Shipping":
+    if item_status == "in the process of shipment":
       body = body2
     elif item_status == "In our Warehouse":
       body = body3
