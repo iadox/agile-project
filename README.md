@@ -17,3 +17,5 @@ Suhaib made some design changes that shall appear in the next Commit.
 -----------8th Commit 9/January/2023 -----------
 Odai Modified the email send functionality and Added a Logo for the App.  
 Suhaib made some changes to the application's Design. 
+-----------9th Commit 10/Jan/2023 --------------
+Odai Connected the application to Sqlite Database and fixed a few bugs
