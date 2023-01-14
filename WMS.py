@@ -136,7 +136,7 @@ def mainmenu(v):
     back_btn.place(y=4,x=20)
 
 def merchendise(v,merch):
-    root.geometry('635x670')
+    root.geometry('750x670')
     for widgets in content.winfo_children():
       widgets.destroy()
     back_btn = HoverButton(content , text= 'Back' ,activebackground='#09fb66', bg='#fb5209' , fg='black' , font=("Times New Roman", 13 ,'bold') ,  command= lambda:mainmenu(v))
@@ -153,6 +153,9 @@ def merchendise(v,merch):
     Customer_items_list = Listbox(list_frame, width=80, height=30, font=("Arial", 12))
     cursor.execute("SELECT * FROM items")
     full_list = (cursor.fetchall())
+    obj_list.clear()
+    warehouse_obj_list.clear()
+    customer_obj_list.clear()
     for item in full_list:
       item = list(item)
       add_from_db(items_list, Customer_items_list, Warehouse_items_list, item)
@@ -202,10 +205,10 @@ def add_screen(items_list, c, w):
     state_field.pack(padx=5, pady=5)
     state.set("Select State of the itme")
     item = Item_attributes(name=item_field,quantity=quantity_field, location=Var,price=price_field, state=state)
-    add_btn = HoverButton(window , text= 'Add Item' ,activebackground='#11aebf', bg='#11fad3' ,height=1,width=9, fg='black' , font=("Times New Roman", 13 ,'bold') ,  command= lambda:add_item(item,items_list, w,c))
+    add_btn = HoverButton(window , text= 'Add Item' ,activebackground='#11aebf', bg='#11fad3' ,height=1,width=9, fg='black' , font=("Times New Roman", 13 ,'bold') ,  command= lambda:add_item(item,items_list, w,c,1))
     add_btn.pack(padx=5, pady=5)
 
-def add_item(item,items_list, w, c):
+def add_item(item,items_list, w, c,operation):
     try:
         name = item.getName().get()
         quantity = item.getQuantity().get()
@@ -218,27 +221,36 @@ def add_item(item,items_list, w, c):
         location = item.getLocation()
         price = item.getPrice()
         state = item.getState()
-    items_list.insert(tk.END, f"{name} ({quantity}) @ {location} , Price Per Unit: {price}$ , Current State: {state}")
-    if location == "Warehouse Merchandise":
-        w.insert(tk.END, f"{name} ({quantity}) @ {location} , Price Per Unit: {price}$ , Current State: {state}")
-    elif location == "Customer Merchandise":
-        c.insert(tk.END, f"{name} ({quantity}) @ {location} , Price Per Unit: {price}$ , Current State: {state}")
+    item_not_there = True
     StrItem = ""
+    '''for i in range(len(obj_list)):
+      try:
+        if obj_list[i] == f"Item Name: {item.getName().get()}, Quantity: {item.getQuantity().get()}, @ {item.getLocation().get()}, Price: {item.getPrice().get()} $, Current State: {item.getState().get()} ":
+          item_not_there = False
+      except:
+        if obj_list[i] == f"Item Name: {item.getName()}, Quantity: {item.getQuantity()}, @ {item.getLocation()}, Price: {item.getPrice()} $, Current State: {item.getState()} ":
+          item_not_there = False
+    if add_this:'''
     try:
-        StrItem = Item_attributes(name=item.getName().get(),quantity=item.getQuantity().get(), location=item.getLocation().get(),price=item.getPrice().get(),state=item.getState().get())
+      StrItem = Item_attributes(name=item.getName().get(),quantity=item.getQuantity().get(), location=item.getLocation().get(),price=item.getPrice().get(),state=item.getState().get())
     except:
-        StrItem = Item_attributes(name=item.getName(),quantity=item.getQuantity(), location=item.getLocation(),price=item.getPrice(),state=item.getState())
+      StrItem = Item_attributes(name=item.getName(),quantity=item.getQuantity(), location=item.getLocation(),price=item.getPrice(),state=item.getState())
+    items_list.insert(tk.END, f"Item Name: {name}, Quantity: {quantity}, @ {location}, Price: {price} $, Current State: {state} ")
+    obj_list.append(StrItem)
+    if location == "Warehouse Merchandise":
+      warehouse_obj_list.append(StrItem)
+      w.insert(tk.END, f"Item Name: {name}, Quantity: {quantity}, @ {location}, Price: {price} $, Current State: {state} ")
+    elif location == "Customer Merchandise":
+      c.insert(tk.END, f"Item Name: {name}, Quantity: {quantity}, @ {location}, Price: {price} $, Current State: {state} ")
+      customer_obj_list.append(StrItem)
     
     query = "INSERT OR IGNORE INTO items VALUES ( ? , ? , ? , ? , ? )"
     params = (name, quantity, price, location, state)
     cursor.execute(query, params)
     con.commit()
-
-    obj_list.append(StrItem)
-    if StrItem.getLocation() == "Warehouse Merchandise":
-        warehouse_obj_list.append(StrItem)
-    elif StrItem.getLocation() == "Customer Merchandise":
-        customer_obj_list.append(StrItem)
+    for i in range(len(obj_list)):
+      print(i)
+      print(obj_list[i].getName())
 
 def remove_item(items_list,w,c, merch):
     selected_item = items_list.curselection()
@@ -291,7 +303,7 @@ def remove_item(items_list,w,c, merch):
 
 def add_from_db(items_list, Customer_items_list, Warehouse_items_list, item):
   objitem = Item_attributes(name=item[0],quantity=item[1], location=item[3],price=item[2], state=item[4])
-  add_item(objitem, items_list,Warehouse_items_list,Customer_items_list)
+  add_item(objitem, items_list,Warehouse_items_list,Customer_items_list,0)
 
 def update_item(items_list,w,c,current_screen):
     ini = items_list.curselection()
@@ -404,7 +416,7 @@ def remove_item_up(items_list, old,w,c,index,m1,m2,m3,tbd):
 
 def update_func(items_list, old, item,w,c,index,m1,m2,m3,tbd):
     remove_item_up(items_list, old,w,c,index,m1,m2,m3,tbd)
-    add_item(item,items_list,w,c)
+    add_item(item,items_list,w,c,1)
 
 def generate_invoice(items):
     window = tk.Tk()
@@ -475,6 +487,10 @@ def notify_screen(lis):
     send_btn.pack(padx=5, pady=5)
 
 def send_func(lis,n,em):
+    item = "item"
+    has = "has"
+    itis = "it is"
+    is_ = "is"
     sender = 'warehouse.system.deliveries@outlook.com'
     name = n.get()
     customer_email = em.get()
@@ -482,15 +498,22 @@ def send_func(lis,n,em):
     item_status = lis.getState()
     quantity = float(lis.getQuantity())
     price = float(lis.getPrice())
+    if quantity == 1:
+      pass
+    else:
+      item = "items"
+      has = "have"
+      itis = "they're"
+      is_ = "are"
     if item_status == "In_Warehouse":
       item_status = "In our Warehouse"
     elif item_status == "Shipping":
       item_status = "in the process of shipment"
-    body = f'''Subject: Your Item has been delivered\n \n\nDear {name},\n\nThe item you ordered ({item_name}: Quantity:{quantity}, Total price: {quantity*price}$) have been delivered, please pick them up as soon as possible to prevent theft and make sure to set your delivery item status as Recieved.
+    body = f'''Subject: Your Item has been delivered\n \n\nDear {name},\n\nThe {item} you ordered ({item_name}: Quantity:{quantity}, Total price: {quantity*price}$) {has} been delivered, please pick them up as soon as possible to prevent theft and make sure to set your delivery item status as Recieved.
     \nKind regards, \nThe warehouse'''
-    body2 = f'''Subject: Status Update for your Item\n \n\nDear {name},\n\nThe item you ordered ({item_name}: Quantity:{quantity}, Total price: {quantity*price}$) is currently {item_status}, Thank you for your patience, we will email you as soon as it is delivered to you.
+    body2 = f'''Subject: Status Update for your Item\n \n\nDear {name},\n\nThe {item} you ordered ({item_name}: Quantity:{quantity}, Total price: {quantity*price}$) {is_} currently {item_status}, Thank you for your patience, we will email you as soon as {itis} delivered to you.
     \nKind regards, \nThe warehouse'''
-    body3 = f'''Subject: Status Update for your Item\n \n\nDear {name},\n\nThe item you ordered ({item_name}: Quantity:{quantity}, Total price: {quantity*price}$) is currently {item_status}, Thank you for your patience, we will email you as soon as it is out for delivery.
+    body3 = f'''Subject: Status Update for your Item\n \n\nDear {name},\n\nThe {item} you ordered ({item_name}: Quantity:{quantity}, Total price: {quantity*price}$) {is_} currently {item_status}, Thank you for your patience, we will email you as soon as {itis} out for delivery.
     \nKind regards, \nThe warehouse'''
     
     if item_status == "in the process of shipment":
