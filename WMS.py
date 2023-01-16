@@ -6,6 +6,8 @@ from email.mime.text import MIMEText
 from email import utils
 from enum import Enum
 import sqlite3
+import customtkinter as ct
+from customtkinter import *
 
 
 obj_list = []
@@ -64,27 +66,29 @@ def login():
     for widgets in content.winfo_children():
       widgets.destroy()
     #main_text = Label(content, text = "Login Menu", background='#3d403d',fg='white', font = ("Times New Roman", 20)).pack(fill='x')
-    root.geometry('320x125')
-    frame = LabelFrame(content, text="  Login to Warehouse System  ", padx=5, pady=5, bg="#77a677")
-    frame.pack(padx=10, pady=10)
+    root.geometry('330x120')
+    frame = ct.CTkFrame(master=content)
+    frame.pack()
 
     # Create the username label and entry
-    username_label = Label(frame, text="User Name:", bg="#77a677")
-    username_label.grid(row=1, column=0)
-    username_entry = Entry(frame, width=15)
+    username_label = ct.CTkLabel(frame, text="User Name:")
+    username_label.grid(row=1, column=0, padx=10)
+    username_entry = ct.CTkEntry(frame, width=130, placeholder_text="Username")
     username_entry.grid(row=1, column=1)
 
     # Create the password label and entry
-    password_label = Label(frame, text="Password:", bg="#77a677")
+    password_label = ct.CTkLabel(frame, text="Password:")
     password_label.grid(row=2, column=0)
-    password_entry = Entry(frame, show="*", width=15)
+    password_entry = ct.CTkEntry(frame, show="*", width=130, placeholder_text="Password")
     password_entry.grid(row=2, column=1)
+    theme_changer = ct.CTkSwitch(frame, text="Change Theme",command=changeTheme)
+    theme_changer.grid(row=3)
     def set_text(usern, p,v):
         username_entry.delete(0,END)
         username_entry.insert(0, usern)
         password_entry.delete(0,END)
         password_entry.insert(0,p)
-        mainmenu(v)
+        mainmenu(v,usern)
         return
     v = 1
     # Once login button is clicked we come here
@@ -102,16 +106,16 @@ def login():
         elif username == "Employee" and password == "123":
           status =True
           v = 1
-        verifyLogin(v,status,username_entry,password_entry)
+        verifyLogin(v,status,username_entry,password_entry,username)
         
-    login_button = HoverButton(frame, text="Login",bg="#77a677", command=lambda:login_click())
-    login_button.grid(row=4, column=1)
-    b1 = HoverButton(frame,text="Test Login as Officer",bg="#77a677",command=lambda:set_text("Officer","123",0))
-    b1.grid(row=4, column=2)
+    login_button = ct.CTkButton(frame, width=100 ,text="Login", command=lambda:login_click())
+    login_button.grid(row=3, column=1, pady=5, padx=5)
+    b1 = ct.CTkButton(frame,text="Test Login as Officer",command=lambda:set_text("Officer","123",0))
+    #b1.grid(row=4, column=2, pady=5, padx=5)
 
-def verifyLogin(v,status,username_entry,password_entry):
+def verifyLogin(v,status,username_entry,password_entry,username):
   if status == True:
-    mainmenu(v)
+    mainmenu(v,username)
   else:
     messagebox.showerror("Login Failed", "Logged failed, try again")
     username_entry.delete(0, END)
@@ -119,38 +123,54 @@ def verifyLogin(v,status,username_entry,password_entry):
     password_entry.delete(0, END)
     password_entry.insert(0, "")
     
-def mainmenu(v):
+def mainmenu(v,username):
     selected_items=[]
     for widgets in content.winfo_children():
       widgets.destroy()
-    root.geometry('550x450')
-    main_text = Label(content, text = "Main Menu", background='#3d403d',fg='white', font = ("Times New Roman", 20)).pack(fill='x')
+    root.geometry('420x450')
+    main_text = ct.CTkLabel(content, text = f"Main Menu\nYou're Logged in as an {username}", font = ("Times New Roman", 20))
+    main_text.pack(fill='x')
     
-    customer_btn = HoverButton(content , text= 'Customer merchandise' ,activebackground='#11aebf', bg='#11fad3' ,height=2,width=20, fg='black' , font=("Times New Roman", 13 ,'bold') ,  command= lambda:merchendise(v,1))
+    customer_btn = ct.CTkButton(content , text= 'Customer merchandise' ,width=20 , font=("Times New Roman", 13 ,'bold') ,  command= lambda:merchendise(v,1,username))
     customer_btn.pack(padx= 20, pady=30, side = LEFT, anchor="nw")
 
-    warehouse_btn = HoverButton(content , text= 'Warehouse merchandise' ,bg='#e8db7b',activebackground='#baac41', fg='black' ,height=2,width=20, font=("Times New Roman", 13,'bold') , command= lambda:merchendise(v,0))
+    warehouse_btn = ct.CTkButton(content , text= 'Warehouse merchandise'  ,width=20, font=("Times New Roman", 13,'bold') , command= lambda:merchendise(v,0,username))
     warehouse_btn.pack( padx= 20, pady=30, side = RIGHT, anchor="ne")
 
-    back_btn = HoverButton(content , text= 'Back' ,activebackground='#d2f7d2', bg='#77a677' , fg='black' , font=("Times New Roman", 13 ,'bold') ,  command= lambda:login())
+    back_btn = ct.CTkButton(content , text= 'Back' ,width=10, font=("Times New Roman", 13 ,'bold') ,  command= lambda:login())
     back_btn.place(y=4,x=20)
 
-def merchendise(v,merch):
-    root.geometry('750x670')
+def merchendise(v,merch,username):
+    root.geometry('700x630')
     for widgets in content.winfo_children():
       widgets.destroy()
-    back_btn = HoverButton(content , text= 'Back' ,activebackground='#09fb66', bg='#fb5209' , fg='black' , font=("Times New Roman", 13 ,'bold') ,  command= lambda:mainmenu(v))
-    back_btn.pack(side= TOP, anchor=NW)
+    back_btn = ct.CTkButton(content , text= 'Back'  ,width=60, font=("Times New Roman", 13 ,'bold') ,  command= lambda:mainmenu(v,username))
+    back_btn.place(x=10,y=10)
+    if v == 0:
+      add_btn = ct.CTkButton(content , text= '+'  ,width=24, font=("Times New Roman", 13 ,'bold') ,  command= lambda:add_screen(items_list, Customer_items_list, Warehouse_items_list))
+      add_btn.place(x=625,y=10)
+      remove_btn = ct.CTkButton(content , text= '-'  ,width=27, font=("Times New Roman", 13,'bold') , command= lambda:remove_item(items_list,Warehouse_items_list,Customer_items_list, merch))
+      remove_btn.place(x=590,y=10)
+      upd_btn = ct.CTkButton(content , text= 'Update' ,width=40, font=("Times New Roman", 13 ,'bold') ,  command= lambda:update_item(items_list,Warehouse_items_list,Customer_items_list,merch))
+      upd_btn.place(x=530,y=10)
+    notify_btn = ct.CTkButton(content , text= 'Notify Customer'  ,width=60, font=("Times New Roman", 13 ,'bold') ,  command= lambda:notify(items_list,Warehouse_items_list,Customer_items_list,merch))
+    notify_btn.place(x=295,y=10)
+    inv_btn = ct.CTkButton(content , text= 'Generate Invoice'  ,width=40 , font=("Times New Roman", 13 ,'bold') ,  command= lambda:generate_invoice(items_list))
+    inv_btn.place(x=410,y=10)
+    view_text = ct.CTkLabel(content, text = f"{username}'s View",bg_color="gray",height=10,text_color=("pink","blue"), font = ("Times New Roman", 16))
+    view_text.place(x=298,y=43)
     list_title = ""
     if merch == 0:
       list_title = "Warehouse Merchandise Items:"
     elif merch == 1:
       list_title = "Customer Merchandise Items:"
-    list_frame= LabelFrame(content, text=list_title ,background='#77a677',font=("Times New Roman", 16) )
-    list_frame.pack(pady=20)
-    items_list = Listbox(list_frame, width=80, height=30, font=("Arial", 12))
-    Warehouse_items_list = Listbox(list_frame, width=80, height=30, font=("Arial", 12))
-    Customer_items_list = Listbox(list_frame, width=80, height=30, font=("Arial", 12))
+    list_frame= ct.CTkFrame(content  )
+    list_frame.place(x=10,y=70)
+    list_name = ct.CTkLabel(list_frame, text = f"{list_title}", font = ("Times New Roman", 20))
+    list_name.pack(fill='x')
+    items_list = Listbox(list_frame, width=90, height=30, font=("Arial", 12))
+    Warehouse_items_list = Listbox(list_frame, width=90, height=30, font=("Arial", 12))
+    Customer_items_list = Listbox(list_frame, width=90, height=30, font=("Arial", 12))
     cursor.execute("SELECT * FROM items")
     full_list = (cursor.fetchall())
     obj_list.clear()
@@ -159,53 +179,41 @@ def merchendise(v,merch):
     for item in full_list:
       item = list(item)
       add_from_db(items_list, Customer_items_list, Warehouse_items_list, item)
-    if v == 0:
-      add_btn = HoverButton(content , text= '+' ,bg = "#09fb3d", activebackground='#fb09db' ,height=1,width=3, fg='black' , font=("Times New Roman", 13 ,'bold') ,  command= lambda:add_screen(items_list, Customer_items_list, Warehouse_items_list))
-      add_btn.place(x=380,y=4)
-      remove_btn = HoverButton(content , text= '-' ,bg='#fb091d',activebackground='#baac41', fg='black' ,height=1,width=3, font=("Times New Roman", 13,'bold') , command= lambda:remove_item(items_list,Warehouse_items_list,Customer_items_list, merch))
-      remove_btn.place(x=330, y=4)
-      upd_btn = HoverButton(content , text= 'Update' ,activebackground='#11aebf', bg='#11fad3' ,height=1,width=6, fg='black' , font=("Times New Roman", 13 ,'bold') ,  command= lambda:update_item(items_list,Warehouse_items_list,Customer_items_list,merch))
-      upd_btn.place(x=250,y=4)
     if merch == 1:
       Customer_items_list.pack(padx=5, pady=5)
     elif merch == 0:
       Warehouse_items_list.pack(padx=5, pady=5)
-    inv_btn = HoverButton(content , text= 'Generate Invoice' ,activebackground='#11aebf', bg='#11fad3' ,height=1,width=13, fg='black' , font=("Times New Roman", 13 ,'bold') ,  command= lambda:generate_invoice(items_list))
-    inv_btn.place(x=100,y=4)
-    notify_btn = HoverButton(content , text= 'Notify Customer' ,activebackground='#11aebf', bg='#11fad3' ,height=1,width=13, fg='black' , font=("Times New Roman", 13 ,'bold') ,  command= lambda:notify(items_list,Warehouse_items_list,Customer_items_list,merch))
-    notify_btn.place(x=430,y=4)
 
 def add_screen(items_list, c, w):
-    window = tk.Tk()
+    window = ct.CTkToplevel()
     window.title('Add Item Screen')
-    window.geometry('400x400')
-    window.config(bg="#e2d4c9")
-    item_label = Label(window, text="Item Name:")
+    window.geometry('400x430')
+    item_label = ct.CTkLabel(window, text="Item Name:")
     item_label.pack(padx=5, pady=5)
-    item_field = Entry(window, width=35, font=("Arial", 16))
+    item_field = ct.CTkEntry(window, width=200, font=("Arial", 16))
     item_field.pack(padx=5, pady=5)
-    quantity_label = Label(window, text="Quantity:")
+    quantity_label = ct.CTkLabel(window, text="Quantity:")
     quantity_label.pack(padx=5, pady=5)
-    quantity_field = Entry(window, width=35, font=("Arial", 16))
+    quantity_field = ct.CTkEntry(window, width=200, font=("Arial", 16))
     quantity_field.pack(padx=5, pady=5)
-    price_label = Label(window, text="Price Per Unit:")
+    price_label = ct.CTkLabel(window, text="Price Per Unit:")
     price_label.pack(padx=5, pady=5)
-    price_field = Entry(window, width=35, font=("Arial", 16))
+    price_field = ct.CTkEntry(window, width=200, font=("Arial", 16))
     price_field.pack(padx=5, pady=5)
-    location_label = Label(window, text="Category:")
+    location_label = ct.CTkLabel(window, text="Category:")
     location_label.pack(padx=5, pady=5)
     Var = StringVar(window)
-    location_field = OptionMenu(window, Var, "Warehouse Merchandise", "Customer Merchandise")
+    location_field = ct.CTkOptionMenu(window,variable=Var, values= [ "Warehouse Merchandise", "Customer Merchandise"])
     location_field.pack(padx=5, pady=5)
     Var.set("Select Marchandise")
-    state_label = Label(window, text="State of the item:")
+    state_label = ct.CTkLabel(window, text="State of the item:")
     state_label.pack(padx=5, pady=5)
     state = StringVar(window)
-    state_field = OptionMenu(window, state, "Delivered" ,"Shipping","In_Warehouse" )
+    state_field = ct.CTkOptionMenu(window ,variable=state,values= [ "Delivered" ,"Shipping","In_Warehouse"])
     state_field.pack(padx=5, pady=5)
-    state.set("Select State of the itme")
+    state.set("Select State of the item")
     item = Item_attributes(name=item_field,quantity=quantity_field, location=Var,price=price_field, state=state)
-    add_btn = HoverButton(window , text= 'Add Item' ,activebackground='#11aebf', bg='#11fad3' ,height=1,width=9, fg='black' , font=("Times New Roman", 13 ,'bold') ,  command= lambda:add_item(item,items_list, w,c,1))
+    add_btn = ct.CTkButton(window , text= 'Add Item' , font=("Times New Roman", 13 ,'bold') ,  command= lambda:add_item(item,items_list, w,c,1))
     add_btn.pack(padx=5, pady=5)
 
 def add_item(item,items_list, w, c,operation):
@@ -223,14 +231,6 @@ def add_item(item,items_list, w, c,operation):
         state = item.getState()
     item_not_there = True
     StrItem = ""
-    '''for i in range(len(obj_list)):
-      try:
-        if obj_list[i] == f"Item Name: {item.getName().get()}, Quantity: {item.getQuantity().get()}, @ {item.getLocation().get()}, Price: {item.getPrice().get()} $, Current State: {item.getState().get()} ":
-          item_not_there = False
-      except:
-        if obj_list[i] == f"Item Name: {item.getName()}, Quantity: {item.getQuantity()}, @ {item.getLocation()}, Price: {item.getPrice()} $, Current State: {item.getState()} ":
-          item_not_there = False
-    if add_this:'''
     try:
       StrItem = Item_attributes(name=item.getName().get(),quantity=item.getQuantity().get(), location=item.getLocation().get(),price=item.getPrice().get(),state=item.getState().get())
     except:
@@ -336,39 +336,38 @@ def update_item(items_list,w,c,current_screen):
       update_screen(items_list, obj_list[ind],w,c,index,items_list_m,w_m,c_m,to_be_deleted)
 
 def update_screen(items_list, old,w,c,index,m1,m2,m3,tbd):
-    window = tk.Tk()
+    window = ct.CTkToplevel()
     window.title('Update Item Screen')
-    window.geometry('400x400')
-    window.config(bg="#e2d4c9")
-    item_label = Label(window, text="Item Name:")
+    window.geometry('400x430')
+    item_label = ct.CTkLabel(window, text="Item Name:")
     item_label.pack(padx=5, pady=5)
-    item_field = Entry(window, width=35, font=("Arial", 16))
+    item_field = ct.CTkEntry(window, width=200, font=("Arial", 16))
     item_field.insert(END,old.getName())
     item_field.pack(padx=5, pady=5)
-    quantity_label = Label(window, text="Quantity:")
+    quantity_label = ct.CTkLabel(window, text="Quantity:")
     quantity_label.pack(padx=5, pady=5)
-    quantity_field = Entry(window, width=35, font=("Arial", 16))
+    quantity_field = ct.CTkEntry(window, width=200, font=("Arial", 16))
     quantity_field.insert(END, old.getQuantity())
     quantity_field.pack(padx=5, pady=5)
-    price_label = Label(window, text="Price Per Unit:")
+    price_label = ct.CTkLabel(window, text="Price Per Unit:")
     price_label.pack(padx=5, pady=5)
-    price_field = Entry(window, width=35, font=("Arial", 16))
+    price_field = ct.CTkEntry(window, width=200, font=("Arial", 16))
     price_field.insert(END,old.getPrice())
     price_field.pack(padx=5, pady=5)
-    location_label = Label(window, text="Category:")
+    location_label = ct.CTkLabel(window, text="Category:")
     location_label.pack(padx=5, pady=5)
     Var = StringVar(window)
-    location_field = OptionMenu(window, Var, "Warehouse Merchandise", "Customer Merchandise")
+    location_field = ct.CTkOptionMenu(window, variable=Var, values= [ "Warehouse Merchandise", "Customer Merchandise"])
     location_field.pack(padx=5, pady=5)
     Var.set(old.getLocation())
-    state_label = Label(window, text= "Status of the item")
+    state_label = ct.CTkLabel(window, text= "Status of the item")
     state_label.pack(padx=5, pady=5)
     state = StringVar(window)
-    state_field = OptionMenu(window, state, "Delivered" ,"Shipping","In_Warehouse")
+    state_field = ct.CTkOptionMenu(window, variable=state, values= [ "Delivered" ,"Shipping","In_Warehouse"])
     state_field.pack(padx=5, pady=5)
     state.set(old.getState())
     item = Item_attributes(name=item_field,quantity=quantity_field, location=Var,price=price_field,state=state)
-    add_btn = HoverButton(window , text= 'Update Item' ,activebackground='#11aebf', bg='#11fad3' ,height=1,width=9, fg='black' , font=("Times New Roman", 13 ,'bold') ,  command= lambda:update_func(items_list, old, item,w,c,index,m1,m2,m3,tbd))
+    add_btn = ct.CTkButton(window , text= 'Update Item'  , font=("Times New Roman", 13 ,'bold') ,  command= lambda:update_func(items_list, old, item,w,c,index,m1,m2,m3,tbd))
     add_btn.pack(padx=5, pady=5)
 
 def remove_item_up(items_list, old,w,c,index,m1,m2,m3,tbd):
@@ -419,24 +418,23 @@ def update_func(items_list, old, item,w,c,index,m1,m2,m3,tbd):
     add_item(item,items_list,w,c,1)
 
 def generate_invoice(items):
-    window = tk.Tk()
-    window.title('Item invoice')
-    window.geometry('400x400')
-    window.config(bg="#e2d4c9")
-    label1= Label(window, text='Item Invoice :' ,background='#e2d4c9',font=("Times New Roman", 20) )
+    window = ct.CTkToplevel()
+    window.title('Items Invoices')
+    window.geometry('400x430')
+    label1= ct.CTkLabel(window, text='Item Invoice :' ,font=("Times New Roman", 20) )
     label1.pack()
-    text_box = Text(window,font=("Times New Roman", 12), height=15, width=35)
+    text_box = ct.CTkTextbox(window,font=("Times New Roman", 12), height=330, width=300)
     text_box.pack()
     txt = ""
     for i in range(items.size()):
       text_box.insert(INSERT, f"{items.get(i)} "+"\n")
-    ok_btn = HoverButton(window , text= 'Print invoice File' ,activebackground='#d2f7d2', bg='#77a677' , fg='black' , font=("Times New Roman", 13 ,'bold') ,  command= lambda:generate_file(window,text_box.get("1.0", "end-1c")))
+    ok_btn = ct.CTkButton(window , text= 'Print invoice File' , font=("Times New Roman", 13 ,'bold') ,  command= lambda:generate_file(window,text_box.get("1.0", "end-1c")))
     ok_btn.pack()
 
 def generate_file(window,text):
   window.destroy()
   with open("Invoice.txt", "w") as f:
-        f.write("This an Invoice generated by The WMS:\n")
+        f.write("This is an Invoice generated by The WMS:\n")
         f.write(text)
 
 def notify(i,w,c,current_screen):
@@ -471,19 +469,18 @@ def notify(i,w,c,current_screen):
       notify_screen(obj_list[ind])
 
 def notify_screen(lis):
-    window = tk.Tk()
-    window.title('Update Item Screen')
-    window.geometry('400x400')
-    window.config(bg="#e2d4c9")
-    name_of_user = Label(window, text="Enter the name of the Customer you want to notify:")
+    window = ct.CTkToplevel()
+    window.title('Email Customer')
+    window.geometry('400x430')
+    name_of_user = ct.CTkLabel(window, text="Enter the name of the Customer you want to notify:")
     name_of_user.pack(padx=5, pady=5)
-    enter_name = Entry(window, width=35, font=("Arial", 16))
+    enter_name = ct.CTkEntry(window, width=200, font=("Arial", 16))
     enter_name.pack(padx=5, pady=5)
-    email_of_user = Label(window, text="Please Enter a legit email of the Customer you want to notify:")
+    email_of_user = ct.CTkLabel(window, text="Please Enter a legit email of the Customer you want to notify:")
     email_of_user.pack(padx=5, pady=5)
-    enter_email = Entry(window, width=35, font=("Arial", 16))
+    enter_email = ct.CTkEntry(window, width=200, font=("Arial", 16))
     enter_email.pack(padx=5, pady=5)
-    send_btn = HoverButton(window , text= 'Notify Customer' ,activebackground='#11aebf', bg='#11fad3' ,height=1,width=12, fg='black' , font=("Times New Roman", 13 ,'bold') ,  command= lambda:send_func(lis,enter_name,enter_email))
+    send_btn = ct.CTkButton(window , text= 'Notify Customer'  , font=("Times New Roman", 13 ,'bold') ,  command= lambda:send_func(lis,enter_name,enter_email))
     send_btn.pack(padx=5, pady=5)
 
 def send_func(lis,n,em):
@@ -533,23 +530,28 @@ def send_func(lis,n,em):
     smtpObj.sendmail(sender, customer_email, body) 
     smtpObj.quit()
 
+def changeTheme():
+  if ct.AppearanceModeTracker.appearance_mode == 0:
+    ct.set_appearance_mode("dark")
+  else:
+    ct.set_appearance_mode("light")
 
-
-
+#fg_color=("blue","green")
 con = sqlite3.connect('WMS_db.db')
 cursor = con.cursor()
 command_1 = '''CREATE TABLE IF NOT EXISTS 
 items(name TEXT PRIMARY KEY , quantity INTEGER, price FLOAT, location BLOB, status BLOB)'''
 cursor.execute(command_1)
-root = tk.Tk()
+theme = "light"
+ct.set_appearance_mode(f"{theme}")
+ct.set_default_color_theme("dark-blue")
+root = ct.CTk()
 root.title('Warehouse Management System')
-root.geometry('635x670')
 root.resizable(True,True)
 p1 = PhotoImage(file = 'logo.png')
 root.iconphoto(False, p1)
-content = Frame(root)
-content.config(bg="#77a677")
-content.pack(fill = BOTH, expand = True)
+content = ct.CTkFrame(master=root)
+content.pack(fill = BOTH, expand = True, pady=5,padx=5)
 login()
 
 root.mainloop()

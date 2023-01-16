@@ -35,3 +35,18 @@ Suhaib made some changes to the application's Design.
     
 
 Odai Connected the application to Sqlite Database and fixed a few bugs.   
+  
+    
+       
+
+--------------------10th Commit 16th/Jan/2023---------------    
+
+
+After submitting it to our customer, they asked for two modifications( a redesign and the ability to see the user role when logged in ), 
+Odai Redesigned the app using customtkinter, and added the desired role feature.  
+
+if the code doesn't run first time for you, then you might need to to install customrkinter using the command "pip install customtkinter" 
+
+
+
+
